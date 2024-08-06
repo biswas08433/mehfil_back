@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -16,6 +20,10 @@ type User struct {
 
 func main() {
 	server := echo.New()
+
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
 
 	p := make([]User, 0)
 	p = append(p, User{
@@ -39,5 +47,8 @@ func main() {
 	server.GET("/", func(ctx echo.Context) error {
 		return ctx.JSON(http.StatusOK, p)
 	})
-	server.Logger.Fatal(server.Start("localhost:5678"))
+
+	address := fmt.Sprintf("%s:%s", os.Getenv("IP"), os.Getenv("PORT"))
+
+	server.Logger.Fatal(server.Start(address))
 }
